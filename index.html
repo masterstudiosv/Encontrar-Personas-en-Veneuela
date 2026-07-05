@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ENPERVEN | Encontrando Personas en Venezuela</title>
+<meta name="description" content="ENPERVEN es una iniciativa tecnológica independiente que desarrolla una plataforma nacional para el registro, identificación y seguimiento de personas durante emergencias y crisis humanitarias en Venezuela.">
+<meta name="keywords" content="ENPERVEN, personas desaparecidas Venezuela, emergencias, plataforma humanitaria, registro nacional">
+<meta property="og:title" content="ENPERVEN - Encontrando Personas en Venezuela">
+<meta property="og:description" content="Plataforma nacional para el registro y localización de personas en situaciones de emergencia. Únete al proyecto.">
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Bootstrap 5 (solo como grid/reset) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Iconos -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+/* ==========================================================================
+   1. TOKENS DE DISEÑO
+   ========================================================================== */
+:root{
+  --azul-profundo:#0A1730;
+  --azul-noche:#0F2149;
+  --azul-medio:#1E4FA3;
+  --azul-brillo:#3E7BFF;
+  --amarillo:#FFC933;
+  --rojo:#E43D3D;
+  --marfil:#F4F6FB;
+  --marfil-suave:#C6CEE0;
+  --linea:rgba(255,255,255,0.10);
+  --cristal:rgba(255,255,255,0.055);
+  --cristal-borde:rgba(255,255,255,0.14);
+
+  --fuente-titulo:'Montserrat', sans-serif;
+  --fuente-texto:'Inter', sans-serif;
+
+  --radio-lg:28px;
+  --radio-md:18px;
+  --sombra-suave:0 20px 60px rgba(3,8,20,0.45);
+}
+
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--azul-profundo);
+  color:var(--marfil);
+  font-family:var(--fuente-texto);
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4,.font-titulo{font-family:var(--fuente-titulo);}
+a{text-decoration:none;color:inherit;}
+::selection{background:var(--amarillo);color:var(--azul-profundo);}
+
+:focus-visible{
+  outline:2px solid var(--amarillo);
+  outline-offset:3px;
+  border-radius:6px;
+}
+
+/* Respeto de movimiento reducido */
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important;}
+}
+
+/* ==========================================================================
+   2. FONDO GLOBAL - Formas abstractas, glassmorphism y luces
+   ========================================================================== */
+.lienzo-fondo{
+  position:fixed;
+  inset:0;
+  z-index:-2;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(62,123,255,0.28), transparent 45%),
+    radial-gradient(circle at 85% 15%, rgba(255,201,51,0.14), transparent 40%),
+    radial-gradient(circle at 75% 80%, rgba(228,61,61,0.16), transparent 45%),
+    linear-gradient(160deg, var(--azul-profundo) 0%, var(--azul-noche) 55%, var(--azul-profundo) 100%);
+}
+
+.ruido-textura{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  opacity:0.035;
+  pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.superficie-cristal{
+  background:var(--cristal);
+  border:1px solid var(--cristal-borde);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  border-radius:var(--radio-lg);
+  box-shadow:var(--sombra-suave);
+}
+
+/* ==========================================================================
+   3. UTILIDADES DE SECCIÓN
+   ========================================================================== */
+.seccion{
+  position:relative;
+  padding:110px 0;
+}
+@media (max-width:768px){ .seccion{padding:70px 0;} }
+
+.marca-seccion{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  font-family:var(--fuente-titulo);
+  font-weight:700;
+  font-size:0.78rem;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  color:var(--amarillo);
+  margin-bottom:16px;
+}
+.marca-seccion .pulso-mini{
+  width:9px;height:9px;border-radius:50%;
+  background:var(--amarillo);
+  box-shadow:0 0 0 0 rgba(255,201,51,0.6);
+  animation:pulso-mini 2.4s infinite;
+}
+@keyframes pulso-mini{
+  0%{box-shadow:0 0 0 0 rgba(255,201,51,0.55);}
+  70%{box-shadow:0 0 0 9px rgba(255,201,51,0);}
+  100%{box-shadow:0 0 0 0 rgba(255,201,51,0);}
+}
+
+.titulo-seccion{
+  font-weight:800;
+  font-size:clamp(1.9rem, 3.4vw, 2.7rem);
+  line-height:1.15;
+  margin-bottom:18px;
+  color:var(--marfil);
+}
+.texto-seccion{
+  color:var(--marfil-suave);
+  font-size:1.05rem;
+  line-height:1.75;
+  max-width:640px;
+}
+
+.franja-degradada{
+  height:3px;
+  width:64px;
+  border-radius:4px;
+  background:linear-gradient(90deg, var(--azul-brillo), var(--amarillo), var(--rojo));
+  margin-bottom:22px;
+}
+
+/* Reveal on scroll (JS toggles .visible) */
+.revelar{
+  opacity:0;
+  transform:translateY(28px);
+  transition:opacity 0.8s ease, transform 0.8s ease;
+}
+.revelar.visible{opacity:1; transform:translateY(0);}
+
+/* ==========================================================================
+   4. NAVBAR
+   ========================================================================== */
+.barra-nav{
+  position:fixed;
+  top:0; left:0; right:0;
+  z-index:1000;
+  padding:16px 0;
+  transition:all 0.4s ease;
+}
+.barra-nav.al-hacer-scroll{
+  padding:10px 0;
+  background:rgba(10,23,48,0.72);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--linea);
+}
+.marca-nav{display:flex;align-items:center;gap:12px;font-weight:800;font-family:var(--fuente-titulo);font-size:1.15rem;}
+.marca-nav img{height:40px;width:40px;object-fit:contain;filter:drop-shadow(0 4px 10px rgba(0,0,0,0.35));}
+.enlace-nav{
+  color:var(--marfil-suave);
+  font-weight:600;
+  font-size:0.92rem;
+  margin:0 14px;
+  position:relative;
+  transition:color 0.25s ease;
+}
+.enlace-nav::after{
+  content:'';
+  position:absolute; left:0; bottom:-6px;
+  width:0; height:2px;
+  background:var(--amarillo);
+  transition:width 0.3s ease;
+}
+.enlace-nav:hover{color:var(--marfil);}
+.enlace-nav:hover::after{width:100%;}
+
+.btn-primario{
+  background:linear-gradient(135deg, var(--azul-brillo), var(--azul-medio));
+  color:#fff;
+  border:none;
+  padding:12px 28px;
+  border-radius:50px;
+  font-weight:700;
+  font-size:0.92rem;
+  letter-spacing:0.02em;
+  box-shadow:0 10px 25px rgba(62,123,255,0.35);
+  transition:transform 0.3s ease, box-shadow 0.3s ease;
+}
+.btn-primario:hover{transform:translateY(-3px); box-shadow:0 16px 32px rgba(62,123,255,0.45); color:#fff;}
+
+.btn-secundario{
+  background:transparent;
+  border:1.5px solid rgba(255,255,255,0.35);
+  color:var(--marfil);
+  padding:11px 26px;
+  border-radius:50px;
+  font-weight:700;
+  font-size:0.92rem;
+  transition:all 0.3s ease;
+}
+.btn-secundario:hover{background:rgba(255,255,255,0.08); border-color:var(--amarillo); color:var(--marfil);}
+
+/* ==========================================================================
+   5. HERO
+   ========================================================================== */
+.hero{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  position:relative;
+  padding-top:120px;
+  padding-bottom:60px;
+}
+
+.forma-hero{
+  position:absolute;
+  border-radius:50%;
+  filter:blur(70px);
+  opacity:0.55;
+  z-index:0;
+}
+.forma-hero.f1{width:420px;height:420px;background:var(--azul-brillo);top:-80px;right:-100px;}
+.forma-hero.f2{width:320px;height:320px;background:var(--rojo);opacity:0.28;bottom:0;left:-120px;}
+.forma-hero.f3{width:260px;height:260px;background:var(--amarillo);opacity:0.22;bottom:10%;right:12%;}
+
+/* Radar: motivo visual de "localización" - elemento distintivo de la página */
+.radar-localizacion{
+  position:absolute;
+  right:5%;
+  top:50%;
+  transform:translateY(-50%);
+  width:420px;
+  height:420px;
+  z-index:0;
+  opacity:0.9;
+}
+@media (max-width:991px){ .radar-localizacion{display:none;} }
+.radar-localizacion .anillo{
+  position:absolute;
+  border:1px solid rgba(62,123,255,0.35);
+  border-radius:50%;
+  inset:0;
+}
+.radar-localizacion .anillo:nth-child(2){inset:60px;}
+.radar-localizacion .anillo:nth-child(3){inset:120px;}
+.radar-localizacion .barrido{
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  background:conic-gradient(from 0deg, rgba(62,123,255,0.55), transparent 35%);
+  animation:girar-radar 5s linear infinite;
+  mix-blend-mode:screen;
+}
+@keyframes girar-radar{ to{ transform:rotate(360deg); } }
+.radar-localizacion .punto{
+  position:absolute;
+  width:10px;height:10px;
+  border-radius:50%;
+  background:var(--amarillo);
+  box-shadow:0 0 14px 4px rgba(255,201,51,0.65);
+  animation:parpadeo-punto 3s ease-in-out infinite;
+}
+.radar-localizacion .punto.p1{top:30%; left:38%; animation-delay:0.3s;}
+.radar-localizacion .punto.p2{top:65%; left:60%; animation-delay:1.4s;}
+.radar-localizacion .punto.p3{top:48%; left:20%; animation-delay:2.1s;}
+@keyframes parpadeo-punto{
+  0%,100%{opacity:0.25; transform:scale(0.9);}
+  50%{opacity:1; transform:scale(1.15);}
+}
+
+.contenedor-logo-hero{
+  width:104px;height:104px;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:28px;
+  margin-bottom:28px;
+  background:var(--cristal);
+  border:1px solid var(--cristal-borde);
+  backdrop-filter:blur(14px);
+}
+.contenedor-logo-hero img{width:68px;height:68px;object-fit:contain;}
+
+.etiqueta-estado{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:7px 16px;
+  border-radius:50px;
+  background:rgba(255,201,51,0.12);
+  border:1px solid rgba(255,201,51,0.35);
+  color:var(--amarillo);
+  font-size:0.78rem;
+  font-weight:700;
+  letter-spacing:0.05em;
+  margin-bottom:22px;
+}
+
+.hero h1{
+  font-weight:900;
+  font-size:clamp(2.4rem, 5.2vw, 4.1rem);
+  line-height:1.08;
+  margin-bottom:10px;
+}
+.hero h1 .resaltado{
+  background:linear-gradient(120deg, var(--azul-brillo), var(--amarillo) 60%, var(--rojo));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.subtitulo-hero{
+  font-family:var(--fuente-titulo);
+  font-weight:600;
+  font-size:1.1rem;
+  color:var(--marfil-suave);
+  margin-bottom:18px;
+}
+.eslogan-hero{
+  font-size:1.06rem;
+  color:var(--marfil-suave);
+  max-width:560px;
+  line-height:1.75;
+  margin-bottom:34px;
+}
+.grupo-botones-hero{display:flex; gap:16px; flex-wrap:wrap;}
+
+.indicador-scroll{
+  position:absolute;
+  bottom:28px;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+  color:var(--marfil-suave);
+  font-size:0.75rem;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  animation:flotar 2.4s ease-in-out infinite;
+}
+@keyframes flotar{ 0%,100%{transform:translate(-50%,0);} 50%{transform:translate(-50%,8px);} }
+
+/* ==========================================================================
+   6. CUENTA REGRESIVA
+   ========================================================================== */
+.panel-cuenta-regresiva{
+  padding:46px 34px;
+  text-align:center;
+}
+.fila-contador{
+  display:flex;
+  justify-content:center;
+  gap:18px;
+  flex-wrap:wrap;
+  margin-top:26px;
+}
+.unidad-tiempo{
+  width:108px;
+  padding:20px 8px;
+  border-radius:var(--radio-md);
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--linea);
+}
+.unidad-tiempo .numero{
+  font-family:var(--fuente-titulo);
+  font-weight:800;
+  font-size:2.3rem;
+  line-height:1;
+  background:linear-gradient(180deg, #fff, var(--marfil-suave));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.unidad-tiempo .etiqueta{
+  font-size:0.72rem;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--marfil-suave);
+  margin-top:6px;
+}
+@media (max-width:576px){ .unidad-tiempo{width:76px; padding:14px 4px;} .unidad-tiempo .numero{font-size:1.6rem;} }
+
+.mensaje-lanzamiento-oculto{display:none;}
+
+/* ==========================================================================
+   7. TARJETAS GENÉRICAS
+   ========================================================================== */
+.tarjeta{
+  padding:34px 30px;
+  height:100%;
+  transition:transform 0.35s ease, border-color 0.35s ease;
+}
+.tarjeta:hover{transform:translateY(-8px); border-color:rgba(255,255,255,0.28);}
+.icono-tarjeta{
+  width:56px;height:56px;
+  border-radius:16px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.4rem;
+  margin-bottom:20px;
+}
+.icono-tarjeta.azul{background:rgba(62,123,255,0.16); color:#7FA6FF;}
+.icono-tarjeta.amarillo{background:rgba(255,201,51,0.16); color:var(--amarillo);}
+.icono-tarjeta.rojo{background:rgba(228,61,61,0.16); color:#FF8A8A;}
+
+.tarjeta h4{font-weight:700; font-size:1.15rem; margin-bottom:12px;}
+.tarjeta p{color:var(--marfil-suave); font-size:0.95rem; line-height:1.7; margin:0;}
+
+/* ==========================================================================
+   8. ¿POR QUÉ NACE? - Lista de problemas
+   ========================================================================== */
+.item-problema{
+  display:flex;
+  gap:18px;
+  padding:20px 0;
+  border-bottom:1px solid var(--linea);
+}
+.item-problema:last-child{border-bottom:none;}
+.item-problema .marcador{
+  flex-shrink:0;
+  width:42px;height:42px;
+  border-radius:12px;
+  background:rgba(228,61,61,0.14);
+  color:#FF8A8A;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.05rem;
+}
+.item-problema h5{font-weight:700; margin-bottom:4px; font-size:1.02rem;}
+.item-problema p{color:var(--marfil-suave); margin:0; font-size:0.93rem; line-height:1.65;}
+
+/* ==========================================================================
+   9. COBERTURA - Ilustración abstracta del territorio
+   ========================================================================== */
+.mapa-abstracto{
+  position:relative;
+  height:380px;
+  border-radius:var(--radio-lg);
+  background:radial-gradient(circle at 30% 30%, rgba(62,123,255,0.18), transparent 60%);
+  overflow:hidden;
+}
+.mapa-abstracto svg{width:100%; height:100%;}
+.nodo-region{
+  fill:var(--amarillo);
+  animation:parpadeo-punto 3.2s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   10. ESTADO DEL PROYECTO
+   ========================================================================== */
+.barra-progreso-exterior{
+  width:100%;
+  height:14px;
+  border-radius:50px;
+  background:rgba(255,255,255,0.08);
+  overflow:hidden;
+  margin:26px 0 14px;
+}
+.barra-progreso-interior{
+  height:100%;
+  width:0%;
+  border-radius:50px;
+  background:linear-gradient(90deg, var(--azul-brillo), var(--amarillo));
+  transition:width 1.6s cubic-bezier(0.22,1,0.36,1);
+}
+.lista-fases{
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:10px;
+}
+.fase{
+  font-size:0.82rem;
+  color:var(--marfil-suave);
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.fase .punto-fase{width:9px;height:9px;border-radius:50%; background:rgba(255,255,255,0.25);}
+.fase.completada .punto-fase{background:var(--amarillo);}
+.fase.completada{color:var(--marfil);}
+.fase.actual .punto-fase{background:var(--azul-brillo); box-shadow:0 0 0 4px rgba(62,123,255,0.25);}
+.fase.actual{color:var(--marfil); font-weight:600;}
+
+/* ==========================================================================
+   11. FORMA PARTE + FORMULARIO
+   ========================================================================== */
+.tarjeta-rol{
+  padding:26px 22px;
+  text-align:left;
+}
+.tarjeta-rol i{color:var(--amarillo); font-size:1.3rem; margin-bottom:12px; display:block;}
+.tarjeta-rol h5{font-weight:700; font-size:1rem; margin-bottom:6px;}
+.tarjeta-rol p{color:var(--marfil-suave); font-size:0.88rem; margin:0; line-height:1.55;}
+
+.contenedor-formulario{
+  padding:30px;
+  margin-top:50px;
+}
+.envoltorio-iframe{
+  max-width:640px;
+  margin:0 auto;
+  border-radius:var(--radio-md);
+  overflow:hidden;
+  background:#fff;
+  box-shadow:0 25px 60px rgba(0,0,0,0.35);
+}
+.envoltorio-iframe iframe{
+  width:100%;
+  height:1331px;
+  border:none;
+  display:block;
+}
+@media (max-width:576px){
+  .envoltorio-iframe iframe{height:1500px;}
+}
+
+/* ==========================================================================
+   12. REDES SOCIALES
+   ========================================================================== */
+.boton-red{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:18px 22px;
+  border-radius:var(--radio-md);
+  background:var(--cristal);
+  border:1px solid var(--cristal-borde);
+  transition:all 0.3s ease;
+}
+.boton-red i{
+  font-size:1.5rem;
+  width:46px;height:46px;
+  border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,0.06);
+}
+.boton-red .titulo-red{font-weight:700; font-size:0.95rem;}
+.boton-red .sub-red{font-size:0.78rem; color:var(--marfil-suave);}
+.boton-red:hover{transform:translateY(-4px); border-color:var(--amarillo); box-shadow:0 14px 30px rgba(0,0,0,0.3);}
+
+/* ==========================================================================
+   13. AVISO IMPORTANTE
+   ========================================================================== */
+.panel-aviso{
+  padding:38px 34px;
+  border-left:3px solid var(--amarillo);
+}
+.panel-aviso i{color:var(--amarillo); font-size:1.6rem; margin-bottom:14px;}
+.panel-aviso p{color:var(--marfil-suave); line-height:1.75; margin-bottom:10px; font-size:0.95rem;}
+.panel-aviso p:last-child{margin-bottom:0;}
+
+/* ==========================================================================
+   14. FOOTER
+   ========================================================================== */
+.pie-pagina{
+  padding:60px 0 30px;
+  border-top:1px solid var(--linea);
+  position:relative;
+}
+.marca-footer{display:flex; align-items:center; gap:12px; margin-bottom:14px;}
+.marca-footer img{height:38px;width:38px;object-fit:contain;}
+.marca-footer span{font-family:var(--fuente-titulo); font-weight:800; font-size:1.1rem;}
+.texto-footer{color:var(--marfil-suave); font-size:0.88rem; line-height:1.7; max-width:340px;}
+.titulo-columna-footer{font-weight:700; font-size:0.9rem; letter-spacing:0.05em; text-transform:uppercase; color:var(--marfil); margin-bottom:16px;}
+.enlace-footer{display:block; color:var(--marfil-suave); font-size:0.9rem; margin-bottom:10px; transition:color 0.25s ease;}
+.enlace-footer:hover{color:var(--amarillo);}
+.franja-inferior{
+  border-top:1px solid var(--linea);
+  margin-top:40px;
+  padding-top:22px;
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
+  font-size:0.8rem;
+  color:var(--marfil-suave);
+}
+.silueta-bandera{
+  display:inline-flex;
+  gap:3px;
+  margin-right:8px;
+}
+.silueta-bandera span{width:5px; height:16px; border-radius:2px;}
+.silueta-bandera span:nth-child(1){background:var(--azul-brillo);}
+.silueta-bandera span:nth-child(2){background:var(--amarillo);}
+.silueta-bandera span:nth-child(3){background:var(--rojo);}
+</style>
+</head>
+<body>
+
+<!-- Fondo decorativo global -->
+<div class="lienzo-fondo" aria-hidden="true"></div>
+<div class="ruido-textura" aria-hidden="true"></div>
+
+<!-- ==========================================================================
+     NAVBAR
+     ========================================================================== -->
+<nav class="barra-nav" id="barraNav">
+  <div class="container d-flex align-items-center justify-content-between">
+    <a href="#inicio" class="marca-nav">
+      <img src="logo/ENPERVEN logo.png" alt="Logo de ENPERVEN" onerror="this.style.display='none'">
+      ENPERVEN
+    </a>
+    <div class="d-none d-lg-flex align-items-center">
+      <a href="#que-es" class="enlace-nav">Qué es</a>
+      <a href="#objetivos" class="enlace-nav">Objetivos</a>
+      <a href="#estado" class="enlace-nav">Estado</a>
+      <a href="#forma-parte" class="enlace-nav">Únete</a>
+      <a href="#contacto" class="enlace-nav">Contacto</a>
+    </div>
+    <a href="#forma-parte" class="btn-primario d-none d-md-inline-block">Únete al proyecto</a>
+  </div>
+</nav>
+
+<!-- ==========================================================================
+     HERO
+     ========================================================================== -->
+<header class="hero" id="inicio">
+  <div class="forma-hero f1" aria-hidden="true"></div>
+  <div class="forma-hero f2" aria-hidden="true"></div>
+  <div class="forma-hero f3" aria-hidden="true"></div>
+
+  <div class="radar-localizacion" aria-hidden="true">
+    <div class="anillo"></div>
+    <div class="anillo"></div>
+    <div class="anillo"></div>
+    <div class="barrido"></div>
+    <div class="punto p1"></div>
+    <div class="punto p2"></div>
+    <div class="punto p3"></div>
+  </div>
+
+  <div class="container position-relative" style="z-index:2;">
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="contenedor-logo-hero">
+          <img src="logo/ENPERVEN logo.png" alt="Logo de ENPERVEN" onerror="this.style.display='none'">
+        </div>
+
+        <span class="etiqueta-estado"><i class="bi bi-lightning-charge-fill"></i> Proyecto en desarrollo · Lanzamiento 07/07/2026</span>
+
+        <h1>Cada persona <span class="resaltado">localizada</span> es una familia que vuelve a respirar.</h1>
+        <p class="subtitulo-hero">ENPERVEN — Encontrando Personas en Venezuela</p>
+        <p class="eslogan-hero">Una iniciativa tecnológica independiente que construye una base de datos nacional para registrar, identificar y dar seguimiento a personas durante emergencias, desastres naturales y crisis humanitarias en todo el territorio venezolano.</p>
+
+        <div class="grupo-botones-hero">
+          <a href="#que-es" class="btn-primario">Conoce ENPERVEN</a>
+          <a href="#forma-parte" class="btn-secundario">Únete al proyecto</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="indicador-scroll" aria-hidden="true">
+    <span>Desliza</span>
+    <i class="bi bi-chevron-down"></i>
+  </div>
+</header>
+
+<!-- ==========================================================================
+     CUENTA REGRESIVA
+     ========================================================================== -->
+<section class="seccion" id="cuenta-regresiva">
+  <div class="container">
+    <div class="superficie-cristal panel-cuenta-regresiva revelar">
+      <span class="marca-seccion"><span class="pulso-mini"></span> Lanzamiento oficial</span>
+      <h2 class="titulo-seccion" style="margin-bottom:6px;">Faltan pocos días para activar ENPERVEN</h2>
+      <p class="texto-seccion" style="margin:0 auto;">El 07 de julio de 2026 damos el primer paso oficial. Este es el tiempo que resta.</p>
+
+      <div class="fila-contador" id="filaContador">
+        <div class="unidad-tiempo"><div class="numero" id="numDias">00</div><div class="etiqueta">Días</div></div>
+        <div class="unidad-tiempo"><div class="numero" id="numHoras">00</div><div class="etiqueta">Horas</div></div>
+        <div class="unidad-tiempo"><div class="numero" id="numMinutos">00</div><div class="etiqueta">Minutos</div></div>
+        <div class="unidad-tiempo"><div class="numero" id="numSegundos">00</div><div class="etiqueta">Segundos</div></div>
+      </div>
+
+      <p class="mensaje-lanzamiento-oculto" id="mensajeLanzamiento" style="margin-top:22px; font-weight:700; color:var(--amarillo); font-size:1.1rem;">
+        <i class="bi bi-check-circle-fill"></i> ENPERVEN ha sido oficialmente lanzado. Gracias por ser parte de este momento.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     ¿QUÉ ES ENPERVEN?
+     ========================================================================== -->
+<section class="seccion" id="que-es">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6 revelar">
+        <span class="marca-seccion"><span class="pulso-mini"></span> ¿Qué es ENPERVEN?</span>
+        <h2 class="titulo-seccion">Una base de datos nacional para no perder de vista a nadie.</h2>
+        <p class="texto-seccion">ENPERVEN es una plataforma pensada para registrar, organizar y centralizar información sobre personas localizadas en cualquier punto del territorio venezolano durante situaciones de emergencia. Su propósito es servir de apoyo a los organismos autorizados en los procesos de identificación y seguimiento, evitando que la información se pierda o quede dispersa entre distintas instituciones.</p>
+      </div>
+      <div class="col-lg-6 revelar">
+        <div class="superficie-cristal p-4 p-lg-5">
+          <div class="row g-4">
+            <div class="col-6">
+              <i class="bi bi-database-fill-check" style="color:var(--azul-brillo); font-size:1.8rem;"></i>
+              <h5 class="mt-3 mb-1" style="font-weight:700; font-size:1rem;">Registro centralizado</h5>
+              <p style="color:var(--marfil-suave); font-size:0.88rem; margin:0;">Un solo lugar para toda la información.</p>
+            </div>
+            <div class="col-6">
+              <i class="bi bi-geo-alt-fill" style="color:var(--amarillo); font-size:1.8rem;"></i>
+              <h5 class="mt-3 mb-1" style="font-weight:700; font-size:1rem;">Alcance nacional</h5>
+              <p style="color:var(--marfil-suave); font-size:0.88rem; margin:0;">Diseñado para todo el territorio.</p>
+            </div>
+            <div class="col-6">
+              <i class="bi bi-people-fill" style="color:#FF8A8A; font-size:1.8rem;"></i>
+              <h5 class="mt-3 mb-1" style="font-weight:700; font-size:1rem;">Enfoque humano</h5>
+              <p style="color:var(--marfil-suave); font-size:0.88rem; margin:0;">Cada dato representa una vida.</p>
+            </div>
+            <div class="col-6">
+              <i class="bi bi-shield-lock-fill" style="color:var(--azul-brillo); font-size:1.8rem;"></i>
+              <h5 class="mt-3 mb-1" style="font-weight:700; font-size:1rem;">Uso responsable</h5>
+              <p style="color:var(--marfil-suave); font-size:0.88rem; margin:0;">Pensado para organismos autorizados.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     ¿POR QUÉ NACE ENPERVEN?
+     ========================================================================== -->
+<section class="seccion" id="por-que" style="background:rgba(255,255,255,0.015);">
+  <div class="container">
+    <div class="row align-items-start g-5">
+      <div class="col-lg-5 revelar">
+        <span class="marca-seccion"><span class="pulso-mini"></span> El origen</span>
+        <h2 class="titulo-seccion">Nace de una necesidad real, no de una idea abstracta.</h2>
+        <p class="texto-seccion">En medio de emergencias y desastres, la información sobre las personas afectadas suele quedar fragmentada entre distintas instituciones, se pierde con el tiempo o simplemente nunca llega a registrarse. ENPERVEN busca convertirse en la herramienta tecnológica que ordene ese proceso.</p>
+      </div>
+      <div class="col-lg-7 revelar">
+        <div class="superficie-cristal p-4 p-lg-5">
+          <div class="item-problema">
+            <div class="marcador"><i class="bi bi-file-earmark-x"></i></div>
+            <div><h5>Pérdida de información</h5><p>Datos valiosos que se extravían por no contar con un registro permanente.</p></div>
+          </div>
+          <div class="item-problema">
+            <div class="marcador"><i class="bi bi-diagram-3"></i></div>
+            <div><h5>Falta de centralización</h5><p>Cada institución guarda sus propios registros, sin una fuente única y confiable.</p></div>
+          </div>
+          <div class="item-problema">
+            <div class="marcador"><i class="bi bi-signpost-split"></i></div>
+            <div><h5>Dificultad para localizar personas</h5><p>Sin un sistema común, encontrar a alguien toma más tiempo del que debería.</p></div>
+          </div>
+          <div class="item-problema">
+            <div class="marcador"><i class="bi bi-arrow-left-right"></i></div>
+            <div><h5>Poca comunicación entre instituciones</h5><p>La información no siempre fluye entre los organismos que la necesitan.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     NUESTRA VISIÓN
+     ========================================================================== -->
+<section class="seccion" id="visión">
+  <div class="container">
+    <div class="row justify-content-center text-center">
+      <div class="col-lg-8 revelar">
+        <span class="marca-seccion justify-content-center"><span class="pulso-mini"></span> Nuestra visión</span>
+        <h2 class="titulo-seccion">Un país donde ninguna persona se pierda entre la información.</h2>
+        <p class="texto-seccion mx-auto">Aspiramos a que ENPERVEN se convierta en un punto de referencia tecnológico para Venezuela: una plataforma que crezca junto a la comunidad, se fortalezca con la colaboración de instituciones y voluntarios, y evolucione con cada nueva idea que se sume al proyecto. Creemos en la innovación construida de forma colectiva, con transparencia y con la persona en el centro de cada decisión.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     OBJETIVOS
+     ========================================================================== -->
+<section class="seccion" id="objetivos" style="background:rgba(255,255,255,0.015);">
+  <div class="container">
+    <div class="row justify-content-center text-center mb-4">
+      <div class="col-lg-7 revelar">
+        <span class="marca-seccion justify-content-center"><span class="pulso-mini"></span> Objetivos</span>
+        <h2 class="titulo-seccion">Lo que buscamos lograr con ENPERVEN</h2>
+      </div>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3 revelar">
+        <div class="superficie-cristal tarjeta">
+          <div class="icono-tarjeta azul"><i class="bi bi-hdd-network-fill"></i></div>
+          <h4>Centralizar la información</h4>
+          <p>Reunir los registros de personas localizadas en un solo sistema nacional confiable.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3 revelar">
+        <div class="superficie-cristal tarjeta">
+          <div class="icono-tarjeta amarillo"><i class="bi bi-clock-history"></i></div>
+          <h4>Agilizar la respuesta</h4>
+          <p>Reducir el tiempo que toma identificar y dar seguimiento a una persona en emergencia.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3 revelar">
+        <div class="superficie-cristal tarjeta">
+          <div class="icono-tarjeta rojo"><i class="bi bi-diagram-2-fill"></i></div>
+          <h4>Conectar instituciones</h4>
+          <p>Facilitar que los organismos autorizados compartan información de forma ordenada.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3 revelar">
+        <div class="superficie-cristal tarjeta">
+          <div class="icono-tarjeta azul"><i class="bi bi-people-fill"></i></div>
+          <h4>Crecer con la comunidad</h4>
+          <p>Construir el proyecto junto a desarrolladores, instituciones y voluntarios.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     COBERTURA
+     ========================================================================== -->
+<section class="seccion" id="cobertura">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6 revelar">
+        <span class="marca-seccion"><span class="pulso-mini"></span> Cobertura</span>
+        <h2 class="titulo-seccion">Pensado para llegar a todo el territorio venezolano.</h2>
+        <p class="texto-seccion">ENPERVEN está diseñado desde su concepción para operar a nivel nacional, sin distinción entre regiones. La meta es que, sin importar en qué punto del país ocurra una emergencia, exista una misma plataforma capaz de registrar y organizar la información de las personas involucradas.</p>
+      </div>
+      <div class="col-lg-6 revelar">
+        <div class="superficie-cristal mapa-abstracto">
+          <svg viewBox="0 0 400 380" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M50,120 Q90,60 160,70 Q230,50 280,90 Q350,110 340,170 Q360,220 300,250 Q280,300 210,290 Q150,320 110,270 Q40,260 40,200 Q20,160 50,120 Z"
+                  fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+            <circle class="nodo-region" cx="120" cy="120" r="6"/>
+            <circle class="nodo-region" cx="220" cy="100" r="6" style="animation-delay:0.6s;"/>
+            <circle class="nodo-region" cx="290" cy="160" r="6" style="animation-delay:1.2s;"/>
+            <circle class="nodo-region" cx="180" cy="210" r="6" style="animation-delay:1.8s;"/>
+            <circle class="nodo-region" cx="110" cy="230" r="6" style="animation-delay:2.4s;"/>
+            <circle class="nodo-region" cx="250" cy="250" r="6" style="animation-delay:0.9s;"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     SEGURIDAD
+     ========================================================================== -->
+<section class="seccion" id="seguridad" style="background:rgba(255,255,255,0.015);">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6 order-lg-2 revelar">
+        <span class="marca-seccion"><span class="pulso-mini"></span> Seguridad</span>
+        <h2 class="titulo-seccion">La confianza se construye desde el código.</h2>
+        <p class="texto-seccion">ENPERVEN se está desarrollando siguiendo buenas prácticas de seguridad informática, con el objetivo de proteger la integridad de cada registro y ofrecer una plataforma estable y confiable para quienes la utilicen.</p>
+      </div>
+      <div class="col-lg-6 order-lg-1 revelar">
+        <div class="row g-4">
+          <div class="col-6">
+            <div class="superficie-cristal tarjeta text-center">
+              <div class="icono-tarjeta azul mx-auto"><i class="bi bi-shield-check"></i></div>
+              <h4 style="font-size:1rem;">Integridad de datos</h4>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="superficie-cristal tarjeta text-center">
+              <div class="icono-tarjeta amarillo mx-auto"><i class="bi bi-lock-fill"></i></div>
+              <h4 style="font-size:1rem;">Acceso controlado</h4>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="superficie-cristal tarjeta text-center">
+              <div class="icono-tarjeta rojo mx-auto"><i class="bi bi-code-slash"></i></div>
+              <h4 style="font-size:1rem;">Buenas prácticas</h4>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="superficie-cristal tarjeta text-center">
+              <div class="icono-tarjeta azul mx-auto"><i class="bi bi-eye-slash-fill"></i></div>
+              <h4 style="font-size:1rem;">Privacidad ante todo</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     ESTADO DEL PROYECTO
+     ========================================================================== -->
+<section class="seccion" id="estado">
+  <div class="container">
+    <div class="superficie-cristal p-4 p-lg-5 revelar">
+      <span class="marca-seccion"><span class="pulso-mini"></span> Estado del proyecto</span>
+      <h2 class="titulo-seccion">ENPERVEN todavía está en construcción.</h2>
+      <p class="texto-seccion">Estamos trabajando activamente en el desarrollo de la plataforma. La fecha oficial de lanzamiento es el <strong style="color:var(--marfil);">07 de julio de 2026</strong>.</p>
+
+      <div class="barra-progreso-exterior">
+        <div class="barra-progreso-interior" id="barraProgreso"></div>
+      </div>
+      <div class="lista-fases">
+        <div class="fase completada"><span class="punto-fase"></span> Planificación</div>
+        <div class="fase completada"><span class="punto-fase"></span> Diseño</div>
+        <div class="fase actual"><span class="punto-fase"></span> Desarrollo</div>
+        <div class="fase"><span class="punto-fase"></span> Pruebas</div>
+        <div class="fase"><span class="punto-fase"></span> Lanzamiento</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     FORMA PARTE DE ENPERVEN
+     ========================================================================== -->
+<section class="seccion" id="forma-parte" style="background:rgba(255,255,255,0.015);">
+  <div class="container">
+    <div class="row justify-content-center text-center mb-5">
+      <div class="col-lg-8 revelar">
+        <span class="marca-seccion justify-content-center"><span class="pulso-mini"></span> Forma parte de ENPERVEN</span>
+        <h2 class="titulo-seccion">Este proyecto se construye con más manos que las nuestras.</h2>
+        <p class="texto-seccion mx-auto">Actualmente buscamos desarrolladores, diseñadores, organizaciones, instituciones, voluntarios y cualquier persona con ideas que aportar. Si crees en lo que ENPERVEN puede llegar a ser, este es el momento de sumarte.</p>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4 revelar">
+        <div class="superficie-cristal tarjeta-rol"><i class="bi bi-code-square"></i><h5>Desarrolladores</h5><p>Backend, frontend, bases de datos y arquitectura del sistema.</p></div>
+      </div>
+      <div class="col-md-4 revelar">
+        <div class="superficie-cristal tarjeta-rol"><i class="bi bi-palette2"></i><h5>Diseñadores</h5><p>Experiencia de usuario, identidad visual y accesibilidad.</p></div>
+      </div>
+      <div class="col-md-4 revelar">
+        <div class="superficie-cristal tarjeta-rol"><i class="bi bi-building"></i><h5>Instituciones y organizaciones</h5><p>Alianzas para fortalecer el alcance humanitario del proyecto.</p></div>
+      </div>
+      <div class="col-md-4 revelar">
+        <div class="superficie-cristal tarjeta-rol"><i class="bi bi-hand-thumbs-up"></i><h5>Voluntarios</h5><p>Apoyo en difusión, contacto con comunidades y logística.</p></div>
+      </div>
+      <div class="col-md-4 revelar">
+        <div class="superficie-cristal tarjeta-rol"><i class="bi bi-lightbulb"></i><h5>Personas con ideas</h5><p>No es necesario un perfil técnico para aportar valor al proyecto.</p></div>
+      </div>
+      <div class="col-md-4 revelar">
+        <div class="superficie-cristal tarjeta-rol"><i class="bi bi-heart"></i><h5>Aliados humanitarios</h5><p>Toda colaboración honesta suma a la misión de ENPERVEN.</p></div>
+      </div>
+    </div>
+
+    <!-- Formulario de registro -->
+    <div class="superficie-cristal contenedor-formulario revelar" id="contacto">
+      <h3 style="font-weight:700; font-size:1.3rem; margin-bottom:6px;">Regístrate para colaborar</h3>
+      <p style="color:var(--marfil-suave); font-size:0.92rem; margin-bottom:26px;">Completa el siguiente formulario y nos pondremos en contacto contigo.</p>
+      <div class="envoltorio-iframe">
+        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeKOjOxwIbvdvheLmnELeXXFhvURbjVilPI-RTRYS3C0T3Rzw/viewform?embedded=true" width="640" height="1331" frameborder="0" marginheight="0" marginwidth="0" title="Formulario de registro ENPERVEN">Cargando…</iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     REDES SOCIALES
+     ========================================================================== -->
+<section class="seccion" id="redes">
+  <div class="container">
+    <div class="row justify-content-center text-center mb-5">
+      <div class="col-lg-7 revelar">
+        <span class="marca-seccion justify-content-center"><span class="pulso-mini"></span> Síguenos</span>
+        <h2 class="titulo-seccion">Sigue de cerca el crecimiento del proyecto</h2>
+      </div>
+    </div>
+    <div class="row g-3 justify-content-center">
+      <div class="col-md-4 revelar">
+        <a href="https://www.instagram.com/enperven/" target="_blank" rel="noopener" class="boton-red">
+          <i class="bi bi-instagram" style="color:#E1306C;"></i>
+          <div><div class="titulo-red">@enperven</div><div class="sub-red">Instagram oficial</div></div>
+        </a>
+      </div>
+      <div class="col-md-4 revelar">
+        <a href="https://www.instagram.com/marvins__h" target="_blank" rel="noopener" class="boton-red">
+          <i class="bi bi-instagram" style="color:#E1306C;"></i>
+          <div><div class="titulo-red">@marvins__h</div><div class="sub-red">Instagram del desarrollador</div></div>
+        </a>
+      </div>
+      <div class="col-md-4 revelar">
+        <a href="https://www.tiktok.com/@marvins__h" target="_blank" rel="noopener" class="boton-red">
+          <i class="bi bi-tiktok" style="color:#fff;"></i>
+          <div><div class="titulo-red">@marvins__h</div><div class="sub-red">TikTok del desarrollador</div></div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     AVISO IMPORTANTE
+     ========================================================================== -->
+<section class="seccion" style="padding-top:0; padding-bottom:60px;">
+  <div class="container">
+    <div class="superficie-cristal panel-aviso revelar">
+      <i class="bi bi-info-circle-fill"></i>
+      <p><strong style="color:var(--marfil);">ENPERVEN es un proyecto independiente.</strong> Actualmente no recibe financiamiento de organismos gubernamentales ni internacionales.</p>
+      <p>Se encuentra en desarrollo gracias al esfuerzo de sus creadores y de las personas que decidan colaborar con la iniciativa.</p>
+      <p>Toda la información enviada mediante el formulario será utilizada únicamente para establecer contacto con posibles colaboradores.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     FOOTER
+     ========================================================================== -->
+<footer class="pie-pagina">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="marca-footer">
+          <img src="logo/ENPERVEN logo.png" alt="Logo de ENPERVEN" onerror="this.style.display='none'">
+          <span>ENPERVEN</span>
+        </div>
+        <p class="texto-footer">Encontrando Personas en Venezuela. Una iniciativa tecnológica independiente al servicio de la comunidad.</p>
+      </div>
+      <div class="col-lg-2 col-6">
+        <div class="titulo-columna-footer">Enlaces</div>
+        <a href="#que-es" class="enlace-footer">Qué es</a>
+        <a href="#objetivos" class="enlace-footer">Objetivos</a>
+        <a href="#estado" class="enlace-footer">Estado</a>
+        <a href="#forma-parte" class="enlace-footer">Únete</a>
+      </div>
+      <div class="col-lg-2 col-6">
+        <div class="titulo-columna-footer">Proyecto</div>
+        <a href="#cobertura" class="enlace-footer">Cobertura</a>
+        <a href="#seguridad" class="enlace-footer">Seguridad</a>
+        <a href="#contacto" class="enlace-footer">Contacto</a>
+      </div>
+      <div class="col-lg-4">
+        <div class="titulo-columna-footer">Redes sociales</div>
+        <a href="https://www.instagram.com/enperven/" target="_blank" rel="noopener" class="enlace-footer"><i class="bi bi-instagram me-2"></i>Instagram oficial</a>
+        <a href="https://www.instagram.com/marvins__h" target="_blank" rel="noopener" class="enlace-footer"><i class="bi bi-instagram me-2"></i>Instagram del desarrollador</a>
+        <a href="https://www.tiktok.com/@marvins__h" target="_blank" rel="noopener" class="enlace-footer"><i class="bi bi-tiktok me-2"></i>TikTok del desarrollador</a>
+      </div>
+    </div>
+
+    <div class="franja-inferior">
+      <span><span class="silueta-bandera"><span></span><span></span><span></span></span>© 2026 ENPERVEN. Proyecto independiente, sin fines de lucro.</span>
+      <span>Hecho con propósito para Venezuela.</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ==========================================================================
+     JAVASCRIPT
+     ========================================================================== -->
+<script>
+(function(){
+  "use strict";
+
+  /* --- Navbar: cambia de estilo al hacer scroll --- */
+  const barraNav = document.getElementById('barraNav');
+  window.addEventListener('scroll', function(){
+    barraNav.classList.toggle('al-hacer-scroll', window.scrollY > 40);
+  });
+
+  /* --- Revelado de elementos al hacer scroll --- */
+  const elementosRevelar = document.querySelectorAll('.revelar');
+  const observador = new IntersectionObserver(function(entradas){
+    entradas.forEach(function(entrada){
+      if(entrada.isIntersecting){
+        entrada.target.classList.add('visible');
+        observador.unobserve(entrada.target);
+      }
+    });
+  }, {threshold:0.15});
+  elementosRevelar.forEach(function(el){ observador.observe(el); });
+
+  /* --- Cuenta regresiva hasta el 07 de julio de 2026 --- */
+  const fechaLanzamiento = new Date("2026-07-07T00:00:00-04:00").getTime();
+  const filaContador = document.getElementById('filaContador');
+  const mensajeLanzamiento = document.getElementById('mensajeLanzamiento');
+
+  function actualizarContador(){
+    const ahora = new Date().getTime();
+    const diferencia = fechaLanzamiento - ahora;
+
+    if(diferencia <= 0){
+      filaContador.style.display = 'none';
+      mensajeLanzamiento.style.display = 'block';
+      clearInterval(intervaloContador);
+      return;
+    }
+
+    const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
+    const horas = Math.floor((diferencia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutos = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
+    const segundos = Math.floor((diferencia % (1000 * 60)) / 1000);
+
+    document.getElementById('numDias').textContent = String(dias).padStart(2, '0');
+    document.getElementById('numHoras').textContent = String(horas).padStart(2, '0');
+    document.getElementById('numMinutos').textContent = String(minutos).padStart(2, '0');
+    document.getElementById('numSegundos').textContent = String(segundos).padStart(2, '0');
+  }
+
+  actualizarContador();
+  const intervaloContador = setInterval(actualizarContador, 1000);
+
+  /* --- Barra de progreso del proyecto (animada al entrar en vista) --- */
+  const PORCENTAJE_AVANCE = 68; // Progreso actual de desarrollo
+  const barraProgreso = document.getElementById('barraProgreso');
+  const observadorProgreso = new IntersectionObserver(function(entradas){
+    entradas.forEach(function(entrada){
+      if(entrada.isIntersecting){
+        barraProgreso.style.width = PORCENTAJE_AVANCE + '%';
+        observadorProgreso.unobserve(entrada.target);
+      }
+    });
+  }, {threshold:0.4});
+  observadorProgreso.observe(barraProgreso);
+
+})();
+</script>
+
+<!-- Bootstrap 5 JS (solo utilidades de grid/colapso, no se usa para lógica propia) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
